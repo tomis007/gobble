@@ -1,0 +1,69 @@
+name: goreleaser
+
+on:
+  push:
+    tags:
+      - '*'
+
+permissions:
+  contents: write
+
+jobs:
+  goreleaser_x64:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '>=1.24.1'
+
+      # Install static libraries for static linking on ubuntu image:
+      # '-linkmode external -extldflags "-static -ldbus-1 -lsystemd -lpcap -lcap -lrdmacm -libverbs -lnl-route-3 -lnl-3"'
+      - name: Download required libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install libsystemd-dev libpcap-dev libcap-dev libpcap0.8-dev libnl-route-3-dev librdmacm-dev -y 
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: '~> v2'
+          args: release -f .github/goreleaser/goreleaser-x64.yaml --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  goreleaser_arm:
+    if: ${{ always() }}
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '>=1.24.1'
+
+      # Install static libraries for static linking on ubuntu image:
+      # '-linkmode external -extldflags "-static -ldbus-1 -lsystemd -lpcap -lcap -lrdmacm -libverbs -lnl-route-3 -lnl-3"'
+      - name: Download required libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install libsystemd-dev libpcap-dev libcap-dev libpcap0.8-dev libnl-route-3-dev librdmacm-dev -y 
+
+      - name: Run GoReleaser
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: '~> v2'
+          args: release -f .github/goreleaser/goreleaser-arm.yaml --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
