@@ -61,6 +61,8 @@ GLOBAL OPTIONS:
    --version, -V               print only the version (default: false)
 ```
 
+To connect to services running on `localhost` use `240.0.0.1` for IPv4 or `[240::1]` for IPv6.
+
 # Description
 Gobble first creates a new user namespace (CLONE_NEWUSER) and runs itself again as a subprocess. Then Gobble creates a new Tun interface with gVisor (default routes are added for the interface), starts a PCAP capture on the created interface, and runs itself again as another subprocess. Gobble then returns to the original UID/GID that the chain started and finally executes the supplied command. The approach is the same as used in [httptap](https://github.com/monasticacademy/httptap) and similar to [tun2socks](https://github.com/xjasonlyu/tun2socks) and [oniux](https://gitlab.torproject.org/tpo/core/oniux).
 
